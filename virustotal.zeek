@@ -17,7 +17,7 @@ export {
 	};
 	
 	## This is your VirusTotal API key and *must* be supplied for this plugin to work.
-	const api_key = "这里填写 VT API key" &redef;
+	const api_key = "" &redef;
 	
 	## Define the number of queries per minute that your API key can make.
 	const queries_per_minute = 4 &redef;
@@ -37,10 +37,7 @@ event zeek_init()
 
 function VirusTotal::parse_result(report: Report, result: string)
 	{
-	if (report?$av_names)
-	   return;
-
-	report$hits = set();
+        report$hits = set();
 	report$av_names = set();
 
 	# I'm parsing JSON this way.  Kill me now.
@@ -95,8 +92,11 @@ function VirusTotal::scan_hash(f: fa_file, hash: string): Report
 				report$mime_type = f$info$mime_type;
 				}
 			parse_result(report, result$body);
-			Log::write(LOG, report);
-			return report;
+			if (report$total_scanners != 0)
+				{
+				Log::write(LOG, report);
+				return report;
+				}
 			}
 		}
 	}

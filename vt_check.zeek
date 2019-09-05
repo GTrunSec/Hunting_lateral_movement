@@ -1,7 +1,6 @@
 @load base/frameworks/notice
 @load frameworks/files/hash-all-files
-@load ./virustotal.bro
-
+@load ./virustotal.zeek
 module VirusTotal;
 
 export {
@@ -19,15 +18,15 @@ export {
 
 event file_hash(f: fa_file, kind: string, hash: string)
     {
+    
     if ( kind == "sha1" && f$info?$mime_type &&
          match_file_types in f$info$mime_type )
         {
-        when ( local info = VirusTotal::scan_hash(f, hash) )
-            {
-	    if (info?$hits)
-	       return;
-	       if ( |info$hits| < hits_to_notice )
-	       	  break;
+        when ( local info = VirusTotal::scan_hash(f, hash) ){
+	if ( info?$hits )
+	   return;
+	if ( |info$hits| < hits_to_notice )
+       	     break;
             local downloader: addr = 0.0.0.0;
             for ( host in f$info$rx_hosts )
                 {
